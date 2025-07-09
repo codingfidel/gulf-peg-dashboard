@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests openpyxl
+      run: pip install pandas requests plotly
 
       - name: Run data update script
         run: python update_data.py
