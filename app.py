@@ -77,3 +77,18 @@ st.markdown("**What this shows:** The offshore market's 3-month forward premium 
             "**Interpretation:** When this rises above 0.5%, it suggests that markets are pricing in a future devaluation—an early sign of stress on the peg.")
 
 st.markdown("**Data sources:** BIS, IMF, national banks (compiled and modeled)")
+
+
+# --- UAE NDF Premium (Crypto P2P Proxy) ---
+st.subheader("📈 UAE NDF Premium (Crypto P2P Proxy)")
+
+df_p2p = pd.read_csv("uae_ndf_p2p_history.csv", parse_dates=["date"])
+
+if not df_p2p.empty:
+    df_p2p["7d_avg"] = df_p2p["ndf_premium_p2p"].rolling(7).mean()
+    st.line_chart(df_p2p.set_index("date")[["ndf_premium_p2p", "7d_avg"]])
+
+    latest = df_p2p.iloc[-1]
+    st.metric("Latest P2P NDF Premium", f"{latest['ndf_premium_p2p']:.4%}", help=f"Price: {latest['usdt_aed_avg']:.2f} AED/USDT on {latest['date'].date()}")
+else:
+    st.warning("No P2P data available yet.")
