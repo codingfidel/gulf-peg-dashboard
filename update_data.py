@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 
-st.set_page_config(layout="wide")
 st.title("Gulf Currency Peg Health Dashboard (UAE, KSA, Qatar)")
 
 # Load data
