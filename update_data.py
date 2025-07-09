@@ -18,7 +18,6 @@ fig_reer.add_trace(go.Scatter(x=df["Year"], y=df["KSA_REER"], name="KSA REER"))
 fig_reer.add_trace(go.Scatter(x=df["Year"], y=df["Qatar_REER"], name="Qatar REER"))
 fig_reer.add_trace(go.Scatter(x=df["Year"], y=[105]*len(df), name="REER Warning", line=dict(dash='dot', color='red')))
 fig_reer.update_layout(height=400, width=1000)
-            "**Interpretation:** If REER rises, the currency becomes less competitive; a REER above 105 may signal overvaluation and stress on the peg.")
 
 # Inflation Differential Plot
 fig_infl = go.Figure()
@@ -27,7 +26,6 @@ fig_infl.add_trace(go.Scatter(x=df["Year"], y=df["KSA_Infl_Diff"], name="KSA - U
 fig_infl.add_trace(go.Scatter(x=df["Year"], y=df["Qatar_Infl_Diff"], name="Qatar - US"))
 fig_infl.add_trace(go.Scatter(x=df["Year"], y=[3]*len(df), name="Inflation Threshold", line=dict(dash='dot', color='red')))
 fig_infl.update_layout(height=400, width=1000)
-            "**Interpretation:** A persistent differential above 3% may indicate domestic overheating, eroding the peg's credibility.")
 
 # FX Reserves Plot with Axis Break
 fig_res = go.Figure()
@@ -52,12 +50,10 @@ fig_res.update_layout(
     width=1000,
     legend=dict(x=0.01, y=0.99)
 )
-            "**Interpretation:** Movements in smaller countries are now apparent, revealing trends that would otherwise appear flat.")
 
 # NDF Premium
 fig_ndf = go.Figure()
 fig_ndf.add_trace(go.Scatter(x=df["Year"], y=df["UAE_NDF_Premium"], name="NDF Premium"))
 fig_ndf.add_trace(go.Scatter(x=df["Year"], y=[0.5]*len(df), name="NDF Threshold", line=dict(dash='dot', color='red')))
 fig_ndf.update_layout(height=400, width=1000)
-            "**Interpretation:** When this rises above 0.5%, it suggests that markets are pricing in a future devaluation—an early sign of stress on the peg.")
 
