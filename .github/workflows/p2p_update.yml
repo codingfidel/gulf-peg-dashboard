@@ -1,0 +1,34 @@
+name: Daily P2P Update
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # runs daily at 3 AM UTC
+  workflow_dispatch:      # allows manual run
+
+jobs:
+  update-p2p:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pandas requests
+
+      - name: Run P2P update script
+        run: python p2p_update.py
+
+      - name: Commit updated CSV
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add uae_ndf_p2p_history.csv
+          git commit -m "Auto-update P2P NDF data"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
