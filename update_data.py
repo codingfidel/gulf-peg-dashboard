@@ -2,6 +2,7 @@
 import pandas as pd
 import requests
 from datetime import datetime
+import time
 
 # IMF SDMX base URL
 IMF_BASE = "https://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/IFS"
@@ -16,16 +17,24 @@ series = {
     "Qatar_Inflation": "QA.M.PCPI_IX",
 }
 
-def fetch_imf(series_code):
+def fetch_imf(series_code, retries=3, timeout=10):
     url = f"{IMF_BASE}/{series_code}?startPeriod=2015"
-    r = requests.get(url)
-    data = r.json()
-    obs = data['CompactData']['DataSet']['Series']['Obs']
-    df = pd.DataFrame(obs)
-    df.columns = ['Date', series_code.split('.')[-1]]
-    df['Date'] = pd.to_datetime(df['Date'])
-    df[series_code.split('.')[-1]] = pd.to_numeric(df[series_code.split('.')[-1]], errors='coerce')
-    return df
+    for attempt in range(retries):
+        try:
+            r = requests.get(url, timeout=timeout)
+            r.raise_for_status()
+            data = r.json()
+            obs = data['CompactData']['DataSet']['Series']['Obs']
+            df = pd.DataFrame(obs)
+            df.columns = ['Date', series_code.split('.')[-1]]
+            df['Date'] = pd.to_datetime(df['Date'])
+            df[series_code.split('.')[-1]] = pd.to_numeric(df[series_code.split('.')[-1]], errors='coerce')
+            return df
+        except Exception as e:
+            print(f"Attempt {attempt+1} failed for {series_code}: {e}")
+            time.sleep(3)
+    print(f"⚠ Failed to fetch IMF data for {series_code} after {retries} attempts.")
+    return pd.DataFrame(columns=['Date', series_code.split('.')[-1]])
 
 # US CPI from FRED
 def fetch_us_cpi():
@@ -41,14 +50,18 @@ def fetch_us_cpi():
 # World Bank REER
 def fetch_reer(country_code, country_name):
     url = f"http://api.worldbank.org/v2/country/{country_code}/indicator/NEER?format=json&per_page=1000"
-    r = requests.get(url)
-    data = r.json()[1]
-    df = pd.DataFrame(data)
-    df = df[['date', 'value']].dropna()
-    df.columns = ['Year', f'{country_name}_REER']
-    df['Year'] = df['Year'].astype(int)
-    df[f'{country_name}_REER'] = df[f'{country_name}_REER'].astype(float)
-    return df
+    try:
+        r = requests.get(url, timeout=10)
+        data = r.json()[1]
+        df = pd.DataFrame(data)
+        df = df[['date', 'value']].dropna()
+        df.columns = ['Year', f'{country_name}_REER']
+        df['Year'] = df['Year'].astype(int)
+        df[f'{country_name}_REER'] = df[f'{country_name}_REER'].astype(float)
+        return df
+    except Exception as e:
+        print(f"⚠ Failed to fetch REER data for {country_name}: {e}")
+        return pd.DataFrame(columns=['Year', f'{country_name}_REER'])
 
 # Fetch IMF data
 dfs = {}
